@@ -4,7 +4,7 @@
 
 开源地址: https://github.com/wjw465150/Querydsl-Reference-Guide-Chinese-version
 
-# Preface(前言)
+# 前言
 
 Querydsl是一个框架，它支持构造静态类型的类似sql的查询。不需要将查询写成内联字符串或外部化到XML文件中，而是可以通过像Querydsl这样的流畅API构造查询。
 
@@ -15,41 +15,41 @@ Querydsl是一个框架，它支持构造静态类型的类似sql的查询。不
 - 可以安全地引用域类型和属性
 - 更好地对域类型的更改进行重构
 
-# 1. Introduction
+# 1. 介绍
 
-## 1.1. Background
+## 1.1. 背景
 
-Querydsl was born out of the need to maintain HQL queries in a typesafe way. Incremental construction of HQL queries requires String concatenation and results in hard to read code. Unsafe references to domain types and properties via plain Strings were another issue with String based HQL construction.
+Querydsl诞生于以类型安全的方式维护HQL查询的需求。HQL查询的增量构造需要字符串连接，导致代码难以阅读。通过纯字符串对域类型和属性的不安全引用是基于String的HQL构造的另一个问题。
 
-With a changing domain model type-safety brings huge benefits in software development. Domain changes are directly reflected in queries and autocomplete in query construction makes query construction faster and safer.
+随着领域模型的不断变化，类型安全在软件开发中带来了巨大的好处。域的变化直接反映在查询中，查询构造中的自动补全使查询构造更加快速和安全。
 
-HQL for Hibernate was the first target language for Querydsl, but nowadays it supports JPA, JDO, JDBC, Lucene, Hibernate Search, MongoDB, Collections and RDFBean as backends.
+HQL for Hibernate是Querydsl的第一个目标语言，但现在它支持JPA、JDO、JDBC、Lucene、Hibernate Search、MongoDB、Collections和RDFBean。
 
-If you are completely new to database access in Java,https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java contains a good overview of the various parts, pieces and options and shows you where exactly QueryDSL fits in.
+如果您是Java数据库访问的新手，https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java 包含了对各个部分、选项的良好概述，并向您展示了QueryDSL适合的具体位置。
 
-## 1.2. Principles
+## 1.2. 规范
 
-*Type safety* is the core principle of Querydsl. Queries are constructed based on generated query types that reflect the properties of your domain types. Also function/method invocations are constructed in a fully type-safe manner.
+*Type safety(类型安全)*  是Querydsl的核心原则。查询是根据生成的查询类型构造的，这些查询类型反映域类型的属性。另外，函数/方法调用也是以完全类型安全的方式构造的。
 
-*Consistency* is another important principle. The query paths and operations are the same in all implementations and also the Query interfaces have a common base interface.
+*Consistency(一致性)* 是另一个重要原则。 查询路径和操作在所有实现中都是相同的，而且 Query 接口有一个共同的基本接口。
 
-To get an impression of the expressivity of the Querydsl query and expression types go to the javadocs and explore `com.querydsl.core.Query`, `com.querydsl.core.Fetchable` and `com.querydsl.core.types.Expression`.
+要了解 Querydsl 查询和表达式类型的表达能力，请访问 javadocs 并探索 `com.querydsl.core.Query`、`com.querydsl.core.Fetchable` 和 `com.querydsl.core.types.Expression `.
 
-# 2. Tutorials
+# 2. 教程
 
-Instead of a general Getting started guide we provide integration guides for the main backends of Querydsl.
+我们为 Querydsl 的主要后端提供集成指南，而不是一般的入门指南。
 
-## 2.1. Querying JPA
+## 2.1. Querying JPA(查询JPA)
 
-Querydsl defines a general statically typed syntax for querying on top of persisted domain model data. JDO and JPA are the primary integration technologies for Querydsl. This guide describes how to use Querydsl in combination with JPA.
+Querydsl 定义了一种通用的静态类型语法，用于在持久域模型数据之上进行查询。 JDO 和 JPA 是 Querydsl 的主要集成技术。 本指南介绍了如何将 Querydsl 与 JPA 结合使用。
 
-Querydsl for JPA is an alternative to both JPQL and Criteria queries. It combines the dynamic nature of Criteria queries with the expressiveness of JPQL and all that in a fully typesafe manner.
+Querydsl for JPA 是 JPQL 和 Criteria 查询的替代方案。 它以完全类型安全的方式将 Criteria 查询的动态特性与 JPQL 的表达能力以及所有这些结合起来。
 
-### 2.1.1. Maven integration
+### 2.1.1. Maven集成
 
-Add the following dependencies to your Maven project:
+将以下依赖项添加到您的 Maven 项目中：
 
-```
+```xml
 <dependency>
   <groupId>com.querydsl</groupId>
   <artifactId>querydsl-apt</artifactId>
@@ -70,9 +70,9 @@ Add the following dependencies to your Maven project:
 </dependency>
 ```
 
-And now, configure the Maven APT plugin:
+现在，配置 Maven APT 插件：
 
-```
+```xml
 <project>
   <build>
   <plugins>
@@ -99,21 +99,21 @@ And now, configure the Maven APT plugin:
 </project>
 ```
 
-The JPAAnnotationProcessor finds domain types annotated with the javax.persistence.Entity annotation and generates query types for them.
+`JPAAnnotationProcessor` 查找使用 `javax.persistence.Entity` 注释的域类型并为它们生成查询类型。
 
-If you use Hibernate annotations in your domain types you should use the APT processor `com.querydsl.apt.hibernate.HibernateAnnotationProcessor` instead.
+如果您在域类型中使用 Hibernate 注释，则应改用 APT 处理器 `com.querydsl.apt.hibernate.HibernateAnnotationProcessor`。
 
-Run clean install and you will get your Query types generated into target/generated-sources/java.
+运行`maven clean install`，您将得到生成的查询类型到 `target/generated-sources/java`目录下。
 
-If you use Eclipse, run mvn eclipse:eclipse to update your Eclipse project to include target/generated-sources/java as a source folder.
+如果您使用 Eclipse，请运行 `mvn eclipse:eclipse` 来更新您的 Eclipse 项目以包含 `target/generated-sources/java` 作为源文件夹。
 
-Now you are able to construct JPA query instances and instances of the query domain model.
+现在您可以构建 JPA 查询实例和查询域模型的实例。
 
-### 2.1.2. Ant integration
+### 2.1.2. Ant集成
 
-Place the jar files from the full-deps bundle on your classpath and use the following tasks for Querydsl code generation:
+将 full-deps 包中的 jar 文件放在类路径上，并使用以下任务生成 Querydsl 代码：
 
-```
+```xml
     <!-- APT based code generation -->
     <javac srcdir="${src}" classpathref="cp">
       <compilerarg value="-proc:only"/>
@@ -130,21 +130,21 @@ Place the jar files from the full-deps bundle on your classpath and use the foll
     </javac>
 ```
 
-Replace *src* with your main source folder, *generated* with your folder for generated sources and *build* with your target folder.
+将 *src* 替换为您的主源文件夹，将 *generated* 替换为用于生成源的文件夹，将 *build* 替换为您的目标文件夹。
 
-### 2.1.3. Using Querydsl JPA in Roo
+### 2.1.3. 在 Roo 中使用 Querydsl JPA
 
-If you are using Querydsl JPA with Spring Roo you can replace `com.querydsl.apt.jpa.JPAAnnotationProcessor` with `com.querydsl.apt.roo.RooAnnotationProcessor` which will handle `@RooJpaEntity` and `@RooJpaActiveRecord` annotated classes instead of `@Entity` annotated classes.
+如果您将 Querydsl JPA 与 Spring Roo 一起使用，您可以将`com.querydsl.apt.jpa.JPAAnnotationProcessor`替换为`com.querydsl.apt.roo.RooAnnotationProcessor`，将处理`@RooJpaEntity`和`@RooJpaActiveRecord`注释的类，而不是`@Entity`注释的类。
 
-APT based code generation doesn't work well with AspectJ IDTs.
+基于 APT 的代码生成不适用于 AspectJ IDT。
 
-### 2.1.4. Generating the model from hbm.xml files
+### 2.1.4. 从hbm.xml文件生成模型
 
-If you are using Hibernate with an XML based configuration, you can use the XML metadata to create your Querydsl model.
+如果您将 Hibernate 与基于 XML 的配置一起使用，您可以使用 XML 元数据来创建您的 Querydsl 模型。
 
-`com.querydsl.jpa.codegen.HibernateDomainExporter` provides the functionality for this:
+`com.querydsl.jpa.codegen.HibernateDomainExporter` 提供了以下功能：
 
-```
+```java
 HibernateDomainExporter exporter = new HibernateDomainExporter(
   "Q",                     // name prefix
   new File("target/gen3"), // target folder
@@ -153,17 +153,17 @@ HibernateDomainExporter exporter = new HibernateDomainExporter(
 exporter.export();
 ```
 
-The HibernateDomainExporter needs to be executed within a classpath where the domain types are visible, since the property types are resolved via reflection.
+HibernateDomainExporter 需要在域类型可见的类路径中执行，因为属性类型是通过反射解析的。
 
-All JPA annotations are ignored, but Querydsl annotations such as @QueryInit and @QueryType are taken into account.
+所有 JPA 注释都被忽略，但 Querydsl 注释如 `@QueryInit` 和 `@QueryType` 被考虑在内。
 
-### 2.1.5. Using query types
+### 2.1.5. 使用查询类型
 
-To create queries with Querydsl you need to instantiate variables and Query implementations. We will start with the variables.
+要使用Querydsl创建查询，需要实例化变量和Query实现。我们将从变量开始。
 
-Let's assume that your project has the following domain type:
+让我们假设你的项目有以下域类型:
 
-```
+```java
 @Entity
 public class Customer {
     private String firstName;
@@ -187,96 +187,96 @@ public class Customer {
 }
 ```
 
-Querydsl will generate a query type with the simple name QCustomer into the same package as Customer. QCustomer can be used as a statically typed variable in Querydsl queries as a representative for the Customer type.
+Querydsl 将在与 Customer 相同的包中生成一个简单名称为 QCustomer 的查询类型。 QCustomer 可以用作 Querydsl 查询中的静态类型变量，作为 Customer 类型的代表。
 
-QCustomer has a default instance variable which can be accessed as a static field:
+QCustomer 有一个可以作为静态字段访问的默认实例变量：
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 ```
 
-Alternatively you can define your own Customer variables like this:
+或者，您可以像这样定义自己的 Customer 变量：
 
-```
+```java
 QCustomer customer = new QCustomer("myCustomer");
 ```
 
-### 2.1.6. Querying
+### 2.1.6. 查询
 
-The Querydsl JPA module supports both the JPA and the Hibernate API.
+Querydsl JPA 模块支持 JPA 和 Hibernate API。
 
-To use the JPA API you use `JPAQuery` instances for your queries like this:
+要使用 JPA API，您可以使用 `JPAQuery` 实例进行查询，如下所示：
 
-```
+```java
 // where entityManager is a JPA EntityManager
 JPAQuery<?> query = new JPAQuery<Void>(entityManager);
 ```
 
-If you are using the Hibernate API instead, you can instantiate a `HibernateQuery` like this:
+如果您使用的是 Hibernate API，则可以像这样实例化一个 `HibernateQuery`：
 
-```
+```java
 // where session is a Hibernate session
 HibernateQuery<?> query = new HibernateQuery<Void>(session);
 ```
 
-Both `JPAQuery` and `HibernateQuery` implement the `JPQLQuery` interface.
+`JPAQuery` 和 `HibernateQuery` 都实现了 `JPQLQuery` 接口。
 
-For the examples of this chapter the queries are created via a `JPAQueryFactory` instance. `JPAQueryFactory` should be the preferred option to obtain `JPAQuery` instances.
+对于本章的示例，查询是通过`JPAQueryFactory`实例创建的。 `JPAQueryFactory` 应该是获取 `JPAQuery` 实例的首选选项。
 
-For the Hibernate API `HibernateQueryFactory` can be used
+可以使用 Hibernate API `HibernateQueryFactory`
 
-To retrieve the customer with the first name Bob you would construct a query like this:
+要检索名字为 Bob 的客户，您将构造如下查询：
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 Customer bob = queryFactory.selectFrom(customer)
   .where(customer.firstName.eq("Bob"))
   .fetchOne();
 ```
 
-The selectFrom call defines the query source and projection, the where part defines the filter and fetchOne tells Querydsl to return a single element. Easy, right?
+selectFrom 调用定义了查询源和投影， where 部分定义了过滤器， fetchOne 告诉 Querydsl 返回单个元素。 很简单，对吧？
 
-To create a query with multiple sources you use the query like this:
+要使用多个源创建查询，您可以使用如下查询：
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 QCompany company = QCompany.company;
 query.from(customer, company);
 ```
 
-And to use multiple filters use it like this
+要使用多重过滤就像这样
 
-```
+```java
 queryFactory.selectFrom(customer)
     .where(customer.firstName.eq("Bob"), customer.lastName.eq("Wilson"));
 ```
 
-Or like this
+或者像这样
 
-```
+```java
 queryFactory.selectFrom(customer)
     .where(customer.firstName.eq("Bob").and(customer.lastName.eq("Wilson")));
 ```
 
-In native JPQL form the query would be written like this:
+在原生 JPQL 形式中，查询将这样编写：
 
-```
+```sql
 select customer from Customer as customer
 where customer.firstName = "Bob" and customer.lastName = "Wilson"
 ```
 
-If you want to combine the filters via "or" then use the following pattern
+如果要通过“或”组合过滤器，请使用以下模式
 
-```
+```java
 queryFactory.selectFrom(customer)
     .where(customer.firstName.eq("Bob").or(customer.lastName.eq("Wilson")));
 ```
 
-### 2.1.7. Using joins
+### 2.1.7. 使用连接
 
-Querydsl supports the following join variants in JPQL: inner join, join, left join and right join. Join usage is typesafe, and follows the following pattern:
+Querydsl 支持 JPQL 中的以下联接变体：内联接、联接、左联接和右联接。 联接使用是类型安全的，并遵循以下模式：
 
-```
+```java
 QCat cat = QCat.cat;
 QCat mate = new QCat("mate");
 QCat kitten = new QCat("kitten");
@@ -286,92 +286,92 @@ queryFactory.selectFrom(cat)
     .fetch();
 ```
 
-The native JPQL version of the query would be
+查询的native JPQL 版本将是
 
-```
+```sql
 select cat from Cat as cat
 inner join cat.mate as mate
 left outer join cat.kittens as kitten
 ```
 
-Another example
+另一个例子
 
-```
+```java
 queryFactory.selectFrom(cat)
     .leftJoin(cat.kittens, kitten)
     .on(kitten.bodyWeight.gt(10.0))
     .fetch();
 ```
 
-With the following JPQL version
+相应的JPQL 版本将是
 
-```
+```sql
 select cat from Cat as cat
 left join cat.kittens as kitten
 on kitten.bodyWeight > 10.0
 ```
 
-### 2.1.8. General usage
+### 2.1.8. 一般用法
 
-Use the the cascading methods of the JPQLQuery interface like this
+像这样使用 JPQLQuery 接口的级联方法
 
-*select:* Set the projection of the query. (Not necessary if created via query factory)
+**select:**  设置查询的投影。 （如果通过查询工厂创建则不需要）
 
-*from:* Add the query sources here.
+**from:**  在此处添加查询源。
 
-*innerJoin, join, leftJoin, rightJoin, on:* Add join elements using these constructs. For the join methods the first argument is the join source and the second the target (alias).
+**innerJoin, join, leftJoin, rightJoin, on:**  使用这些构造添加连接元素。 对于连接方法，第一个参数是连接源，第二个参数是目标（别名）。
 
-*where:* Add query filters, either in varargs form separated via commas or cascaded via the and-operator.
+**where:** 添加查询过滤器，以逗号分隔的可变参数形式或通过 and 运算符级联。
 
-*groupBy:* Add group by arguments in varargs form.
+**groupBy:** 以可变参数形式添加 group by 参数。
 
-*having:* Add having filters of the "group by" grouping as an varags array of Predicate expressions.
+**having:** 添加具有“group by”分组的过滤器作为谓词表达式的 varags 数组。
 
-*orderBy:* Add ordering of the result as an varargs array of order expressions. Use asc() and desc() on numeric, string and other comparable expression to access the OrderSpecifier instances.
+**orderBy:** 将结果的排序添加为顺序表达式的可变参数数组。 在数字、字符串和其他可比较的表达式上使用 asc() 和 desc() 来访问 OrderSpecifier 实例。
 
-*limit, offset, restrict:* Set the paging of the result. Limit for max results, offset for skipping rows and restrict for defining both in one call.
+**limit, offset, restrict:** 设置结果的分页。 最大结果的限制，跳过行的偏移量和在一次调用中定义两者的限制。
 
-### 2.1.9. Ordering
+### 2.1.9. 排序
 
 The syntax for declaring ordering is
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 queryFactory.selectFrom(customer)
     .orderBy(customer.lastName.asc(), customer.firstName.desc())
     .fetch();
 ```
 
-which is equivalent to the following native JPQL
+相当于下面的原生 JPQL
 
-```
+```sql
 select customer from Customer as customer
 order by customer.lastName asc, customer.firstName desc
 ```
 
-### 2.1.10. Grouping
+### 2.1.10. 分组
 
-Grouping can be done in the following form
+可以按以下形式进行分组
 
-```
+```java
 queryFactory.select(customer.lastName).from(customer)
     .groupBy(customer.lastName)
     .fetch();
 ```
 
-which is equivalent to the following native JPQL
+相当于下面的原生 JPQL
 
-```
+```sql
 select customer.lastName
 from Customer as customer
 group by customer.lastName
 ```
 
-### 2.1.11. Delete clauses
+### 2.1.11. 删除子句
 
-Delete clauses in Querydsl JPA follow a simple delete-where-execute form. Here are some examples:
+Querydsl JPA 中的删除子句遵循简单的 delete-where-execute 形式。 这里有些例子：
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 // delete all customers
 queryFactory.delete(customer).execute();
@@ -379,15 +379,15 @@ queryFactory.delete(customer).execute();
 queryFactory.delete(customer).where(customer.level.lt(3)).execute();
 ```
 
-The where call is optional and the execute call performs the deletion and returns the amount of deleted entities.
+where 调用是可选的，execute 调用执行删除并返回已删除实体的数量。
 
-DML clauses in JPA don't take JPA level cascade rules into account and don't provide fine-grained second level cache interaction.
+JPA中的DML子句没有考虑JPA级别的级联规则，也不提供细粒度的二级缓存交互。
 
-### 2.1.12. Update clauses
+### 2.1.12. 更新子句
 
 Update clauses in Querydsl JPA follow a simple update-set/where-execute form. Here are some examples:
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 // rename customers named Bob to Bobby
 queryFactory.update(customer).where(customer.name.eq("Bob"))
