@@ -333,7 +333,7 @@ on kitten.bodyWeight > 10.0
 
 ### 2.1.9. 排序
 
-The syntax for declaring ordering is
+声明排序的语法是
 
 ```java
 QCustomer customer = QCustomer.customer;
@@ -381,11 +381,11 @@ queryFactory.delete(customer).where(customer.level.lt(3)).execute();
 
 where 调用是可选的，execute 调用执行删除并返回已删除实体的数量。
 
-JPA中的DML子句没有考虑JPA级别的级联规则，也不提供细粒度的二级缓存交互。
+>  ==**💡提示:**== JPA中的DML子句没有考虑JPA级别的级联规则，也不提供细粒度的二级缓存交互。
 
 ### 2.1.12. 更新子句
 
-Update clauses in Querydsl JPA follow a simple update-set/where-execute form. Here are some examples:
+Querydsl JPA 中的更新子句遵循简单的 update-set/where-execute 形式。 这里有些例子：
 
 ```java
 QCustomer customer = QCustomer.customer;
@@ -395,15 +395,15 @@ queryFactory.update(customer).where(customer.name.eq("Bob"))
     .execute();
 ```
 
-The set invocations define the property updates in SQL-Update-style and the execute call performs the Update and returns the amount of updated entities.
+set调用以sql -Update样式定义属性更新，而execute调用执行Update并返回更新的实体数量。
 
-DML clauses in JPA don't take JPA level cascade rules into account and don't provide fine-grained second level cache interaction.
+>  ==**💡提示:**== JPA中的DML子句没有考虑JPA级别的级联规则，也不提供细粒度的二级缓存交互。
 
-### 2.1.13. Subqueries
+### 2.1.13. 子查询
 
-To create a subquery you use the static factory methods of `JPAExpressions` and define the query parameters via from, where etc.
+要创建子查询，您可以使用`JPAExpressions` 的静态工厂方法并通过 `from` 、`where`  等定义查询参数。
 
-```
+```java
 QDepartment department = QDepartment.department;
 QDepartment d = new QDepartment("d");
 queryFactory.selectFrom(department)
@@ -412,9 +412,9 @@ queryFactory.selectFrom(department)
      .fetch();
 ```
 
-Another example
+另一个例子
 
-```
+```java
 QEmployee employee = QEmployee.employee;
 QEmployee e = new QEmployee("e");
 queryFactory.selectFrom(employee)
@@ -425,23 +425,23 @@ queryFactory.selectFrom(employee)
     .fetch();
 ```
 
-### 2.1.14. Exposing the original query
+### 2.1.14. 暴露原始查询
 
-If you need to tune the original Query before the execution of the query you can expose it like this:
+如果你需要在执行查询之前调整原始查询，你可以像这样暴露它:
 
-```
+```java
 Query jpaQuery = queryFactory.selectFrom(employee).createQuery();
 // ...
 List results = jpaQuery.getResultList();
 ```
 
-### 2.1.15. Using Native SQL in JPA queries
+### 2.1.15. 在JPA查询中使用Native SQL
 
-Querydsl supports Native SQL in JPA via the JPASQLQuery class.
+Querydsl通过`JPASQLQuery`类在JPA中支持Native SQL。
 
 To use it, you must generate Querydsl query types for your SQL schema. This can be done for example with the following Maven configuration:
 
-```
+```xml
 <project>
   <build>
     <plugins>
@@ -477,11 +477,11 @@ To use it, you must generate Querydsl query types for your SQL schema. This can 
 </project>
 ```
 
-When the query types have successfully been generated into the location of your choice, you can use them in your queries.
+当查询类型成功生成到您选择的位置时，您可以在查询中使用它们。
 
-Single column query:
+单列查询:
 
-```
+```java
 // serialization templates
 SQLTemplates templates = new DerbyTemplates();
 // query types (S* for SQL, Q* for domain types)
@@ -493,39 +493,39 @@ JPASQLQuery<?> query = new JPASQLQuery<Void>(entityManager, templates);
 List<String> names = query.select(cat.name).from(cat).fetch();
 ```
 
-If you mix entity (e.g. QCat) and table (e.g. SAnimal) references in your query you need to make sure that they use the same variable names. SAnimal.animal has the variable name "animal", so a new instance (new SAnimal("cat")) was used instead.
+如果您在查询中混合使用实体（例如 QCat）和表（例如 SAnimal）引用，您需要确保它们使用相同的变量名称。 SAnimal.animal 具有变量名称“animal”，因此使用了一个新实例 (new SAnimal("cat"))。
 
-An alternative pattern could be
+另一种模式可能是
 
-```
+```java
 QCat catEntity = QCat.cat;
 SAnimal cat = new SAnimal(catEntity.getMetadata().getName());
 ```
 
-Query multiple columns:
+查询多列：
 
-```
+```java
 query = new JPASQLQuery<Void>(entityManager, templates);
 List<Tuple> rows = query.select(cat.id, cat.name).from(cat).fetch();
 ```
 
-Query all columns:
+查询所有列：
 
-```
+```java
 List<Tuple> rows = query.select(cat.all()).from(cat).fetch();
  
 ```
 
-Query in SQL, but project as entity:
+在 SQL 中查询，但投影为实体：
 
-```
+```java
 query = new JPASQLQuery<Void>(entityManager, templates);
 List<Cat> cats = query.select(catEntity).from(cat).orderBy(cat.name.asc()).fetch();
 ```
 
-Query with joins:
+使用连接查询：
 
-```
+```java
 query = new JPASQLQuery<Void>(entityManager, templates);
 cats = query.select(catEntity).from(cat)
     .innerJoin(mate).on(cat.mateId.eq(mate.id))
@@ -533,9 +533,9 @@ cats = query.select(catEntity).from(cat)
     .fetch();
 ```
 
-Query and project into DTO:
+查询并投影到 DTO：
 
-```
+```java
 query = new JPASQLQuery<Void>(entityManager, templates);
 List<CatDTO> catDTOs = query.select(Projections.constructor(CatDTO.class, cat.id, cat.name))
     .from(cat)
@@ -543,7 +543,7 @@ List<CatDTO> catDTOs = query.select(Projections.constructor(CatDTO.class, cat.id
     .fetch();
 ```
 
-If you are using the Hibernate API instead of the JPA API, then use `HibernateSQLQuery` instead.
+如果您使用的是 Hibernate API 而不是 JPA API，那么请使用`HibernateSQLQuery`。
 
 ## 2.2. Querying JDO
 
@@ -933,13 +933,13 @@ List<CatDTO> catDTOs = query.select(Projections.constructor(CatDTO.class, cat.id
 
 ## 2.3. Querying SQL
 
-This chapter describes the query type generation and querying functionality of the SQL module.
+本章介绍 SQL 模块的查询类型生成和查询功能。
 
-### 2.3.1. Maven integration
+### 2.3.1. Maven集成
 
-Add the following dependencies to your Maven project:
+将以下依赖项添加到您的 Maven 项目中：
 
-```
+```xml
 <dependency>
   <groupId>com.querydsl</groupId>
   <artifactId>querydsl-sql</artifactId>
@@ -960,13 +960,13 @@ Add the following dependencies to your Maven project:
 </dependency>
 ```
 
-The querydsl-sql-codegen dependency can be skipped, if code generation happens via Maven.
+如果通过Maven生成代码，可以跳过querydsl-sql-codegen依赖项。
 
-### 2.3.2. Code generation via Maven
+### 2.3.2. 通过Maven生成代码
 
-This functionality should be primarily used via the Maven plugin. Here is an example:
+这个功能应该主要通过Maven插件来使用。下面是一个例子:
 
-```
+```xml
 <project>
   <build>
     <plugins>
@@ -1002,7 +1002,7 @@ This functionality should be primarily used via the Maven plugin. Here is an exa
 </project>
 ```
 
-Use the goal *test-export* to treat the target folder as a test source folder for use with test code.
+使用目标*test-export*将目标文件夹视为测试源代码文件夹，以便与测试代码一起使用。
 
 
 
@@ -1967,21 +1967,21 @@ QueryEngine queryEngine = new DefaultQueryEngine(evaluatorFactory);
 CollQuery query = new CollQuery(queryEngine);
 ```
 
-# 3. General usage
+# 3. 通用用法
 
-The General usage section covers aspects that are not covered in the tutorial section of the reference documentation. It follows a use case oriented structure.
+通用用法部分涵盖了参考文档的教程部分中没有涉及的方面。它遵循一个面向用例的结构。
 
-## 3.1. Creating queries
+## 3.1. 创建查询
 
-Query construction in Querydsl involves calling query methods with expression arguments. Since query methods are mostly module specific and have already been presented in the tutorial section, this part will focus on expressions.
+Querydsl 中的查询构造涉及使用表达式参数调用查询方法。 由于查询方法大多是特定于模块的，并且已经在教程部分介绍过，因此本部分将重点介绍表达式。
 
-Expressions are normally constructed by accessing fields and calling methods on the generated expression types of your domain module. For cases where code generation is not applicable generic ways to construct expressions can be used instead.
+表达式通常是通过访问域模块生成的表达式类型的字段和调用方法来构造的。对于代码生成不适用的情况，可以使用通用的方法来构造表达式。
 
-### 3.1.1. Complex predicates
+### 3.1.1. 复杂的谓词(predicates)
 
-To construct complex boolean expressions, use the `com.querydsl.core.BooleanBuilder` class. It implements Predicate and can be used in cascaded form:
+要构造复杂的布尔表达式，请使用`com.querydsl.core.BooleanBuilder` 类。 它实现了 Predicate 并且可以以级联形式使用：
 
-```
+```java
 public List<Customer> getCustomer(String... names) {
     QCustomer customer = QCustomer.customer;
     JPAQuery<Customer> query = queryFactory.selectFrom(customer);
@@ -1994,45 +1994,44 @@ public List<Customer> getCustomer(String... names) {
 }
 ```
 
-`BooleanBuilder` is mutable and represents initially null and after each `and` or `or` call the result of the operation.
+`BooleanBuilder` 是可变的，最初表示为 null，并且在每次 `and` 或 `or` 调用之后表示操作的结果。
 
-### 3.1.2. Dynamic expressions
+### 3.1.2. 动态表达式(expressions)
 
-The `com.querydsl.core.types.dsl.Expressions` class is a static factory class for dynamic expression construction. The factory methods are named by the returned type and are mostly self-documenting.
+`com.querydsl.core.types.dsl.Expressions` 类是用于动态表达式构建的静态工厂类。 工厂方法由返回的类型命名，并且大多是自文档的。
 
-In general the `Expressions` class should be used only in cases where fluent DSL forms can't be used, such as dynamic paths, custom syntax or custom operations.
+一般来说，`Expressions` 类应该只在不能使用流畅的 DSL 形式的情况下使用，例如动态路径、自定义语法或自定义操作。
 
-The following expression
+下面的表达式
 
-```
+```java
 QPerson person = QPerson.person;
 person.firstName.startsWith("P");
 ```
 
-could be constructed like this if Q-types wouldn't be available
+如果 Q 类型不可用，可以像这样构造
 
-```
+```java
 Path<Person> person = Expressions.path(Person.class, "person");
 Path<String> personFirstName = Expressions.path(String.class, person, "firstName");
 Constant<String> constant = Expressions.constant("P");
 Expressions.predicate(Ops.STARTS_WITH, personFirstName, constant);
 ```
 
-Path instances represent variables and properties, Constants are constants, Operations are operations and TemplateExpression instances can be used to express expressions as String templates.
+Path 实例表示变量和属性，Constants 是常量，Operations 是操作，TemplateExpression 实例可用于将表达式表示为 String 模板。
 
-### 3.1.3. Dynamic paths
+### 3.1.3. 动态路径
 
-In addition to the `Expressions` based expression creation Querydsl provides also a more fluent API for dynamic path creation.
+除了基于`Expressions` 的表达式创建，Querydsl 还为动态路径创建提供了更流畅的 API。
 
-For dynamic path generation the `com.querydsl.core.types.dsl.PathBuilder` class can be used. It extends `EntityPathBase` and can be used as an alternative to class generation and alias-usage for path generation.
+对于动态路径生成，可以使用 `com.querydsl.core.types.dsl.PathBuilder` 类。 它扩展了`EntityPathBase`，可以用作路径生成的类生成和别名使用的替代方法。
 
-Compared to the Expressions API PathBuilder doesn't provide direct support for unknown operations or custom syntax, but the syntax is closer to the normal DSL.
+与 Expressions API 相比，PathBuilder 不提供对未知操作或自定义语法的直接支持，但语法更接近于普通的 DSL。
 
-String property:
+字符串属性：
 
-```
-PathBuilder<User> entityPath = new
-PathBuilder<User>(User.class, "entity");
+```java
+PathBuilder<User> entityPath = new PathBuilder<User>(User.class, "entity");
 // fully generic access
 entityPath.get("userName");
 // .. or with supplied type
@@ -2041,73 +2040,73 @@ entityPath.get("userName", String.class);
 entityPath.getString("userName").lower();
 ```
 
-List property with component type:
+带有组件类型的列表属性:
 
-```
+```java
 entityPath.getList("list", String.class).get(0);
 ```
 
-Using a component expression type:
+使用组件表达式类型:
 
-```
+```java
 entityPath.getList("list", String.class, StringPath.class).get(0).lower();
 ```
 
-Map property with key and value type:
+带有键和值类型的Map属性:
 
-```
+```java
 entityPath.getMap("map", String.class, String.class).get("key");
 ```
 
-Using a component expression type:
+使用组件表达式类型:
 
-```
+```java
 entityPath.getMap("map", String.class, String.class, StringPath.class).get("key").lower();
 ```
 
-For PathBuilder validation a PathBuilderValidator can be used. It can be injected in the constructor and will be used transitively for the new PathBuilder
+对于PathBuilder验证，可以使用PathBuilderValidator。它可以被注入到构造函数中，并将被传递到新的PathBuilder中
 
-```
+```java
 PathBuilder<Customer> customer = new PathBuilder<Customer>(Customer.class, "customer", validator);
 ```
 
-PathBuilderValidator.FIELDS will verify field existence, PathBuilderValidator.PROPERTIES validates Bean properties and JPAPathBuilderValidator validates using a JPA metamodel.
+PathBuilderValidator.FIELDS 将验证字段是否存在，PathBuilderValidator.PROPERTIES 验证 Bean 属性，JPAPathBuilderValidator 使用 JPA 元模型进行验证。
 
-### 3.1.4. Case expressions
+### 3.1.4. CASE 表达式
 
-To construct case-when-then-else expressions use the `CaseBuilder` class like this:
+要构造 case-when-then-else 表达式，请使用`CaseBuilder`类，如下所示：
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 Expression<String> cases = new CaseBuilder()
     .when(customer.annualSpending.gt(10000)).then("Premier")
     .when(customer.annualSpending.gt(5000)).then("Gold")
     .when(customer.annualSpending.gt(2000)).then("Silver")
     .otherwise("Bronze");
-// The cases expression can now be used in a projection or condition
+// 现在可以在投影或条件中使用 case 表达式
 ```
 
-For case expressions with equals-operations use the following simpler form instead:
+对于具有相等操作的 case 表达式，请改用以下更简单的形式：
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 Expression<String> cases = customer.annualSpending
     .when(10000).then("Premier")
     .when(5000).then("Gold")
     .when(2000).then("Silver")
     .otherwise("Bronze");
-// The cases expression can now be used in a projection or condition
+// 现在可以在投影或条件中使用 case 表达式
 ```
 
-Case expressions are not yet supported in JDOQL.
+JDOQL 尚不支持 Case 表达式。
 
-### 3.1.5. Casting expressions
+### 3.1.5. Casting 表达式
 
-To avoid a generic signature in expression types the type hierarchies are flattened. The result is that all generated query types are direct subclasses of `com.querydsl.core.types.dsl.EntityPathBase` or `com.querydsl.core.types.dsl.BeanPath` and cannot be directly cast to their logical supertypes.
+为了避免表达式类型中的泛型签名，类型层次结构被扁平化。 结果是所有生成的查询类型都是 `com.querydsl.core.types.dsl.EntityPathBase` 或 `com.querydsl.core.types.dsl.BeanPath` 的直接子类，不能直接转换为它们的逻辑超类型。
 
-Instead of a direct Java cast, the supertype reference is accessible via the `_super` field. A _super-field is available in all generated query types with a single supertype:
+超类型引用可以通过`_super`'字段访问，而不是直接的Java强制转换。`_super-field`在所有生成的查询类型中都是可用的，只有一个超类型:
 
-```
+```java
 // from Account
 QAccount extends EntityPathBase<Account> {
     // ...
@@ -2122,37 +2121,37 @@ QBankAccount extends EntityPathBase<BankAccount> {
 }
 ```
 
-To cast from a supertype to a subtype you can use the as-method of the EntityPathBase class:
+要将超类型转换为子类型，可以使用EntityPathBase类的as-method:
 
-```
+```java
 QAccount account = new QAccount("account");
 QBankAccount bankAccount = account.as(QBankAccount.class);
 ```
 
-### 3.1.6. Select literals
+### 3.1.6. 选择字面量(Select literals)
 
-Literals can be selected by referring to them via Constant expressions. Here is a simple example
+可以通过常量表达式引用字面量来选择它们。这里有一个简单的例子
 
-```
+```java
 query.select(Expressions.constant(1),
              Expressions.constant("abc"));
 ```
 
-Constant expressions are often used in subqueries.
+常量表达式常用于子查询中。
 
-## 3.2. Result handling
+## 3.2. 结果处理
 
-Querydsl provides two ways to customize results, FactoryExpressions for row based transformation and ResultTransformer for aggregation.
+Querydsl 提供了两种自定义结果的方式，FactoryExpressions 用于基于行的转换，ResultTransformer 用于聚合。
 
-The `com.querydsl.core.types.FactoryExpression` interface is used for Bean creation, constructor invocation and for the creation of more complex objects. The functionality of the FactoryExpression implementations of Querydsl can be accessed via the `com.querydsl.core.types.Projections` class.
+`com.querydsl.core.types.FactoryExpression` 接口用于 Bean 创建、构造函数调用和更复杂对象的创建。 Querydsl 的 FactoryExpression 实现的功能可以通过`com.querydsl.core.types.Projections` 类访问。
 
-For the `com.querydsl.core.ResultTransformer` interface `GroupBy` is the main implementation.
+对于`com.querydsl.core.ResultTransformer` 接口，`GroupBy` 是主要的实现。
 
-### 3.2.1. Returning multiple columns
+### 3.2.1. 返回多列
 
-Since Querydsl 3.0 the default type for multi-column results is `com.querydsl.core.Tuple`. Tuple provides provides a typesafe Map like interface to access column data from a Tuple row object.
+从 Querydsl 3.0 开始，多列结果的默认类型是 `com.querydsl.core.Tuple`。 Tuple 提供了一个类似类型安全 Map 的接口来访问来自 Tuple 行对象的列数据。
 
-```
+```java
 List<Tuple> result = query.select(employee.firstName, employee.lastName)
                           .from(employee).fetch();
 for (Tuple row : result) {
@@ -2161,9 +2160,9 @@ for (Tuple row : result) {
 }}
 ```
 
-This example could also have been written via the QTuple expression class like this
+这个例子也可以像这样通过 QTuple 表达式类编写
 
-```
+```java
 List<Tuple> result = query.select(new QTuple(employee.firstName, employee.lastName))
                           .from(employee).fetch();
 for (Tuple row : result) {
@@ -2172,34 +2171,34 @@ for (Tuple row : result) {
 }}
 ```
 
-### 3.2.2. Bean population
+### 3.2.2. Bean 操作
 
-In cases where Beans need to be populated based on the results of the query, Bean projections can be used like this
+在需要根据查询结果填充 Bean 的情况下，可以像这样使用 Bean 投影
 
-```
+```java
 List<UserDTO> dtos = query.select(
     Projections.bean(UserDTO.class, user.firstName, user.lastName)).fetch();
 ```
 
-When fields should be directly used instead of setters the following variant can be used instead
+当应该直接使用字段而不是 setter 时，可以使用以下变体:
 
-```
+```java
 List<UserDTO> dtos = query.select(
     Projections.fields(UserDTO.class, user.firstName, user.lastName)).fetch();
 ```
 
-### 3.2.3. Constructor usage
+### 3.2.3.构造函数用法
 
-Constructor based row transformation can be used like this
+可以像这样使用基于构造函数的行转换
 
-```
+```java
 List<UserDTO> dtos = query.select(
     Projections.constructor(UserDTO.class, user.firstName, user.lastName)).fetch();
 ```
 
-As an alternative to the generic Constructor expression usage constructors can also be annotated with the `QueryProjection` annotation:
+作为泛型构造函数表达式的替代用法，构造函数也可以使用`QueryProjection`注解:
 
-```
+```java
 class CustomerDTO {
 
   @QueryProjection
@@ -2210,20 +2209,20 @@ class CustomerDTO {
 }
 ```
 
-And then you can use it like this in the query
+然后你可以像这样在查询中使用它
 
-```
+```java
 QCustomer customer = QCustomer.customer;
 JPQLQuery query = new HibernateQuery(session);
 List<CustomerDTO> dtos = query.select(new QCustomerDTO(customer.id, customer.name))
                               .from(customer).fetch();
 ```
 
-While the example is Hibernate specific, this feature is available in all modules.
+虽然这个示例是特定于Hibernate的，但该特性在所有模块中都可用。
 
-If the type with the QueryProjection annotation is not an annotated entity type, you can use the constructor projection like in the example, but if the annotated type would be an entity type, then the constructor projection would need to be created via a call to the static create method of the query type:
+如果QueryProjection注释的类型不是一个带注释的实体类型,您可以使用构造函数投影,但如果注释的类型是实体类型，则需要通过调用 查询类型的静态`create`方法：
 
-```
+```java
 @Entity
 class Customer {
 
@@ -2233,27 +2232,28 @@ class Customer {
   }
 
 }
+
 QCustomer customer = QCustomer.customer;
 JPQLQuery query = new HibernateQuery(session);
 List<Customer> dtos = query.select(QCustomer.create(customer.id, customer.name))
                            .from(customer).fetch();
 ```
 
-Alternatively, if code generation is not an option, you can create a constructor projection like this:
+或者，如果代码生成是可选的，你可以像这样创建一个构造函数投影:
 
-```
+```java
 List<Customer> dtos = query
     .select(Projections.constructor(Customer.class, customer.id, customer.name))
     .from(customer).fetch();
 ```
 
-### 3.2.4. Result aggregation
+### 3.2.4. 结果聚合
 
-The `com.querydsl.core.group.GroupBy` class provides aggregation functionality which can be used to aggregate query results in memory. Below are some usage examples.
+`com.querydsl.core.group.GroupBy` 类提供聚合功能，可用于在内存中聚合查询结果。 下面是一些使用示例。
 
-Aggregating parent child relations
+聚合父子关系
 
-```
+```java
 import static com.querydsl.core.group.GroupBy.*;
 
 Map<Integer, List<Comment>> results = query.from(post, comment)
@@ -2261,31 +2261,31 @@ Map<Integer, List<Comment>> results = query.from(post, comment)
     .transform(groupBy(post.id).as(list(comment)));
 ```
 
-This will return a map of post ids to related comments.
+这将返回一个帖子 ID 映射到相关评论。
 
-Multiple result columns
+多个结果列
 
-```
+```java
 Map<Integer, Group> results = query.from(post, comment)
     .where(comment.post.id.eq(post.id))
     .transform(groupBy(post.id).as(post.name, set(comment.id)));
 ```
 
-This will return a map of post ids to Group instances with access to post name and comment ids.
+这将返回一个帖子 ID 映射到可以访问帖子名称和评论 ID 的 Group 实例。
 
-Group is the GroupBy equivalent to the Tuple interface.
+Group 是相当于 Tuple 接口的 GroupBy。
 
-More examples can be found [here](https://github.com/querydsl/querydsl/blob/master/querydsl-collections/src/test/java/com/querydsl/collections/GroupByTest.java) .
+更多例子可以在这里找到[这里](https://github.com/querydsl/querydsl/blob/master/querydsl-collections/src/test/java/com/querydsl/collections/GroupByTest.java) .
 
-## 3.3. Code generation
+## 3.3. 代码生成
 
-The Java 6 APT annotation processing functionality is used in Querydsl for code generation in the JPA, JDO and Mongodb modules. This section describes various configuration options for the code generation and an alternative to APT usage.
+Querydsl中使用了Java 6 APT注解处理功能，用于JPA、JDO和Mongodb模块中的代码生成。本节描述用于代码生成的各种配置选项和APT使用的一种替代方法。
 
-### 3.3.1. Path initialization
+### 3.3.1. 路径初始化
 
-By default Querydsl initializes only reference properties of the first two levels. In cases where longer initialization paths are required, these have to be annotated in the domain types via `com.querydsl.core.annotations.QueryInit` annotations. QueryInit is used on properties where deep initializations are needed. The following example demonstrates the usage.
+默认情况下，Querydsl 仅初始化前两层的引用属性。 在需要更长的初始化路径的情况下，必须通过`com.querydsl.core.annotations.QueryInit` 注释在域类型中注释这些路径。 QueryInit 用于需要深度初始化的属性。 下面的例子演示了用法。
 
-```
+```java
 @Entity
 class Event {
     @QueryInit("customer.address")
@@ -2305,29 +2305,29 @@ class Customer {
 }
 ```
 
-This example enforces the initialization of the account.customer path, when an Event path is initialized as a root path / variable. The path initialization format supports wildcards as well, e.g. "customer.*" or just "*".
+当事件路径被初始化为根`路径/变量`时，此示例强制执行 account.customer 路径的初始化。 路径初始化格式也支持通配符，例如 `"customer.*"` 或只是 `"*"`.
 
-The automatic path initialization replaces the manual one, which required the entity fields to be non-final. The declarative format has the benefit to be applied to all top level instances of a Query type and to enable the usage of final entity fields.
+自动路径初始化取代了手动路径初始化，手动路径初始化要求实体字段是非final的。声明式格式的好处是可以应用于Query类型的所有顶级实例，并允许使用final实体字段。
 
-Automatic path initialization is the preferred initialization strategy, but manual initialization can be activated via the Config annotation, which is described below.
+自动路径初始化是首选的初始化策略，但是手动初始化可以通过Config注释激活，下面将对此进行描述。
 
-### 3.3.2. Customization
+### 3.3.2. 定制化
 
-The serialization of Querydsl can be customized via Config annotations on packages and types. They customize the serialization of the annotated package or type.
+Querydsl的序列化可以通过包和类型上的Config注解进行定制。它们自定义带注解的包或类型的序列化。
 
-The serialization options are
+序列化选项是
 
 
 
 **Table 3.1. Config options**
 
-| Name                  | Description                                                  |
-| --------------------- | ------------------------------------------------------------ |
+|          名称          |                                        描述                                        |
+| --------------------- | --------------------------------------------------------------------------------- |
 | entityAccessors       | accessor methods for entity paths instead of public final fields (default: false) |
-| listAccessors         | listProperty(int index) style methods (default: false)       |
-| mapAccessors          | mapProperty(Key key) style accessor methods (default: false) |
-| createDefaultVariable | generate the default variable (default: true)                |
-| defaultVariableName   | name of the default variable                                 |
+| listAccessors         | listProperty(int index) style methods (default: false)                            |
+| mapAccessors          | mapProperty(Key key) style accessor methods (default: false)                      |
+| createDefaultVariable | generate the default variable (default: true)                                     |
+| defaultVariableName   | name of the default variable                                                      |
 
 
 
