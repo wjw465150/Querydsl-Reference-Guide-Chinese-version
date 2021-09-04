@@ -2319,23 +2319,23 @@ Querydsl的序列化可以通过包和类型上的Config注解进行定制。它
 
 
 
-**Table 3.1. Config options**
+**表 3.1. 配置选项**
 
-|          名称          |                                        描述                                        |
-| --------------------- | --------------------------------------------------------------------------------- |
-| entityAccessors       | accessor methods for entity paths instead of public final fields (default: false) |
-| listAccessors         | listProperty(int index) style methods (default: false)                            |
-| mapAccessors          | mapProperty(Key key) style accessor methods (default: false)                      |
-| createDefaultVariable | generate the default variable (default: true)                                     |
-| defaultVariableName   | name of the default variable                                                      |
+|          名称          |                         描述                          |
+| --------------------- | ---------------------------------------------------- |
+| entityAccessors       | 实体路径的访问器方法而不是公共最终字段（默认值：false） |
+| listAccessors         | listProperty(int index) 样式方法 (默认值: false)      |
+| mapAccessors          | mapProperty(Key key) 样式存取方法 (默认值: false)     |
+| createDefaultVariable | 生成默认变量 (默认值: true)                           |
+| defaultVariableName   | 默认变量的名称                                        |
 
 
 
-Below are some examples.
+下面是一些例子。
 
-Customization of Entity type serialization:
+实体类型序列化定制:
 
-```
+```java
 @Config(entityAccessors=true)
 @Entity
 public class User {
@@ -2343,43 +2343,43 @@ public class User {
 }
 ```
 
-Customization of package content:
+包内容定制:
 
-```
+```java
 @Config(listAccessors=true)
 package com.querydsl.core.domain.rel;
 
 import com.querydsl.core.annotations.Config;
 ```
 
-If you want to customize the serializer configuration globally, you can do this via the following APT options
+如果您想全局定制序列化器配置，可以通过以下APT选项来实现
 
 
 
-**Table 3.2. APT options**
+**表 3.2. APT 选项**
 
-| Name                           | Description                                                  |
-| ------------------------------ | ------------------------------------------------------------ |
-| querydsl.entityAccessors       | enable reference field accessors                             |
-| querydsl.listAccessors         | enable accessors for direct indexed list access              |
-| querydsl.mapAccessors          | enable accessors for direct key based map access             |
-| querydsl.prefix                | override the prefix for query types(default: Q)              |
-| querydsl.suffix                | set a suffix for query types                                 |
-| querydsl.packageSuffix         | set a suffix for query type packages                         |
-| querydsl.createDefaultVariable | set whether default variables are created                    |
-| querydsl.unknownAsEmbeddable   | set where unknown non-annotated classes should be treated as embeddable (default: false) |
-| querydsl.includedPackages      | comma separated list of packages to be included into code generation (default: all) |
-| querydsl.includedClasses       | comma separated list of class names to be included into code generation (default: all) |
-| querydsl.excludedPackages      | comma separated list of packages to be excluded from code generation (default: none) |
-| querydsl.excludedClasses       | comma separated list of class names to be excluded from code generation (default: none) |
-| querydsl.useFields             | set whether fields are used as metadata source (default: true) |
-| querydsl.useGetters            | set whether accessors are used as metadata source (default: true) |
+|              名称               |                        描述                         |
+| ------------------------------ | -------------------------------------------------- |
+| querydsl.entityAccessors       | 启用引用字段访问器                                   |
+| querydsl.listAccessors         | 为直接索引列表访问启用访问器                         |
+| querydsl.mapAccessors          | 为直接基于键的映射访问启用访问器                     |
+| querydsl.prefix                | 覆盖查询类型的前缀(默认:Q)                           |
+| querydsl.suffix                | 为查询类型设置后缀                                   |
+| querydsl.packageSuffix         | 设置查询类型包的后缀                                 |
+| querydsl.createDefaultVariable | 设置是否创建默认变量                                 |
+| querydsl.unknownAsEmbeddable   | 设置未知的非注解类应被视为可嵌入的（默认值：false）   |
+| querydsl.includedPackages      | 要包含在代码生成中的包的逗号分隔列表（默认值：all）   |
+| querydsl.includedClasses       | 要包含在代码生成中的类名的逗号分隔列表（默认值：all）  |
+| querydsl.excludedPackages      | 要从代码生成中排除的包的逗号分隔列表（默认值：none)   |
+| querydsl.excludedClasses       | 要从代码生成中排除的类名的逗号分隔列表（默认值：none) |
+| querydsl.useFields             | 设置字段是否用作元数据源（默认值：true）              |
+| querydsl.useGetters            | 设置是否将访问器用作元数据源（默认值：true）          |
 
 
 
-Using the Maven APT plugin this works for example like this:
+使用 Maven APT 插件，它的工作方式如下：
 
-```
+```xml
 <project>
   <build>
   <plugins>
@@ -2410,9 +2410,9 @@ Using the Maven APT plugin this works for example like this:
 </project>
 ```
 
-Alternatively `maven-compiler-plugin` can be configured to hook APT directly into compilation:
+或者，`maven-compiler-plugin` 可以配置为将 APT 直接挂接到编译中：
 
-```
+```xml
       <project>
         <build>
         <plugins>
@@ -2446,20 +2446,20 @@ Alternatively `maven-compiler-plugin` can be configured to hook APT directly int
       </project>
 ```
 
-Notice that you need to use a proper classifier when defining dependency to `com.querydsl:querydsl-apt`. Those additional artifacts define the annotation processor to be used in `META-INF/services/javax.annotation.processing.Processor`.
+请注意，在定义对`com.querydsl:querydsl-apt` 的依赖时，您需要使用适当的分类器。 这些额外的工件定义了要在`META-INF/services/javax.annotation.processing.Processor`中使用的注释处理器。
 
-Available classifiers include:
+可用的分类器包括：
 
 - `general`
 - `hibernate`
 - `jdo`
 - `jpa`
 
-With this configuration query objects can have their sources generated and compiled during compilation of the domain objects. This will also automatically add the generated sources directory to Maven project source roots.
+通过此配置，可以在编译域对象期间生成和编译查询对象的源。这还将自动将生成的源目录添加到Maven项目的根目录中。
 
-The great advantage of this approach is that it can also handle annotated Groovy classes using `groovy-eclipse` compiler:
+这种方法的一大优点是它还可以使用 `groovy-eclipse` 编译器处理带注解的 Groovy 类：
 
-```
+```xml
       <project>
         <build>
         <plugins>
@@ -2504,13 +2504,13 @@ The great advantage of this approach is that it can also handle annotated Groovy
       </project>
 ```
 
-### 3.3.3. Custom type mappings
+### 3.3.3. 自定义类型映射
 
-Custom type mappings can be used on properties to override the derived Path type. This can be useful for example in cases where comparison and String operations should be blocked on certain String paths or Date / Time support for custom types needs to be added. Support for Date / Time types of the Joda time API and JDK (java.util.Date, Calendar and subtypes) is built in, but other APIs might need to be supported using this feature.
+可以在属性上使用自定义类型映射来覆盖派生的Path类型。这在某些情况下很有用，例如比较和String操作应该在特定的String路径上被阻塞，或者需要添加对自定义类型的Date / Time支持。 支持Joda时间API和JDK的日期/时间类型(java.util.Date , Calendar和子类型)是内置的，但可能需要使用此特性支持其他api。
 
-The following example demonstrates the usage:
+下面的例子演示了用法:
 
-```
+```java
 @Entity
 public class MyEntity {
     @QueryType(PropertyType.SIMPLE)
@@ -2524,15 +2524,15 @@ public class MyEntity {
 }
 ```
 
-The value `PropertyType.NONE` can be used to skip a property in the query type generation. This case is different from @Transient or @QueryTransient annotated properties, where properties are not persisted. PropertyType.NONE just omits the property from the Querydsl query type.
+ `PropertyType.NONE` 可用于跳过查询类型生成中的属性。 这种情况与`@Transient` 或`@QueryTransient` 注解属性不同，属性不持久化。 `PropertyType.NONE` 只是从 Querydsl 查询类型中省略了属性。
 
-### 3.3.4. Delegate methods
+### 3.3.4. 代理方法
 
-To declare a static method as a delegate method add the QueryDelegate annotation with the corresponding domain type as a value and provide a method signature that takes the corresponding Querydsl query type as the first argument.
+要将静态方法声明为代理方法，请添加带有相应域类型作为值的`QueryDelegate`注解，并提供将相应的 Querydsl 查询类型作为第一个参数的方法签名。
 
-Here is a simple example from a unit test:
+这是单元测试中的一个简单示例：
 
-```
+```java
 @QueryEntity
 public static class User {
 
@@ -2547,17 +2547,17 @@ public static BooleanPath isManagedBy(QUser user, User other) {
 }
 ```
 
-And the generated methods in the QUser query type:
+以及 QUser 查询类型中生成的方法：
 
-```
+```java
 public BooleanPath isManagedBy(QUser other) {
     return DelegateTest.isManagedBy(this, other);
 }
 ```
 
-Delegate methods can also be used to extend built-in types. Here are some examples
+代理方法也可用于扩展内置类型。 这里有些例子
 
-```
+```java
 public class QueryExtensions {
 
     @QueryDelegate(Date.class)
@@ -2577,9 +2577,9 @@ public class QueryExtensions {
 }
 ```
 
-When delegate methods are declared for builtin types then subclasses with the proper delegate method usages are created:
+当为内置类型声明代理方法时，就会创建具有适当代理方法用法的子类:
 
-```
+```java
 public class QDate extends DatePath<java.sql.Date> {
 
     public QDate(BeanPath<? extends java.sql.Date> entity) {
@@ -2613,13 +2613,13 @@ public class QTimestamp extends DateTimePath<java.sql.Timestamp> {
 }
 ```
 
-### 3.3.5. Non-annotated types
+### 3.3.5. 非注解类型
 
-It is possible to create Querydsl query types for non annotated types by creating `@QueryEntities` annotations. Just place a QueryEntities annotation into a package of your choice and the classes to mirrored in the value attribute.
+可以通过创建 `@QueryEntities` 注解来为非注解类型创建 Querydsl 查询类型。 只需将 QueryEntities 注解放入您选择的包中，并在 value 属性中映射要映射的类。
 
-To actually create the types use the `com.querydsl.apt.QuerydslAnnotationProcessor`. In Maven you do it like this:
+要实际创建类型，请使用 `com.querydsl.apt.QuerydslAnnotationProcessor`。 在 Maven 中，您可以这样做：
 
-```
+```xml
 <project>
   <build>
   <plugins>
@@ -2646,16 +2646,17 @@ To actually create the types use the `com.querydsl.apt.QuerydslAnnotationProcess
 </project>
 ```
 
-### 3.3.6. Classpath based code generation
+### 3.3.6. 基于类路径(Classpath)的代码生成
 
-For cases where annotated Java sources are not available, such as the usage of a different JVM language such as Scala or Groovy or annotation addition via bytecode manipulation the `GenericExporter` class can be used to scan the classpath for annotated classes and generate query types for them.
+对于带注解的 Java 源代码不可用的情况，例如使用不同的 JVM 语言（如 Scala 或 Groovy）或通过字节码操作添加注解，`GenericExporter`类可用于扫描带注解类的类路径并为他们生成查询类型 。
 
-To make GenericExporter available add a dependency to the querydsl-codegen module to your project, or to be more precise `com.querydsl:querydsl-codegen:${querydsl.version}`.
+要使 GenericExporter 可用，请将 querydsl-codegen 模块的依赖项添加到您的项目中，或者更准确地说是`com.querydsl:querydsl-codegen:${querydsl.version}`。
 
-Below is an example for JPA
+以下是 JPA 的示例
 
-```
+```java
 GenericExporter exporter = new GenericExporter();
+
 exporter.setKeywords(Keywords.JPA);
 exporter.setEntityAnnotation(Entity.class);
 exporter.setEmbeddableAnnotation(Embeddable.class);
@@ -2663,38 +2664,38 @@ exporter.setEmbeddedAnnotation(Embedded.class);
 exporter.setSupertypeAnnotation(MappedSuperclass.class);
 exporter.setSkipAnnotation(Transient.class);
 exporter.setTargetFolder(new File("target/generated-sources/java"));
+
 exporter.export(DomainClass.class.getPackage());
+export("org.xyz.abc")
 ```
 
-This will export all the JPA annotated classes in the package of the DomainClass class and subpackages to the target/generated-sources/java directory.
+这会将 指定包名和子包的包中的所有 JPA 注解类导出到 `target/generated-sources/java` 目录。
 
-#### 3.3.6.1. Usage via Maven
+#### 3.3.6.1. 通过 Maven 使用
 
-The goals generic-export, jpa-export and jdo-export of the querydsl-maven-plugin can be used for GenericExporter usage via Maven.
+`querydsl-maven-plugin` 的目标 `generic-export`、`jpa-export` 和 `jdo-export` 可通过 Maven 用于 GenericExporter。
 
-The different goals are mapped to the Querydsl, JPA and JDO annotations.
+不同的目标映射到 Querydsl、JPA 和 JDO 注解。
 
-The configuration elements are
+配置元素是
 
+**表 3.3. Maven 配置**
 
-
-**Table 3.3. Maven configuration**
-
-| Type     | Element        | Description                                                  |
-| -------- | -------------- | ------------------------------------------------------------ |
-| File     | targetFolder   | target folder for generated sources                          |
-| boolean  | scala          | true, if Scala sources should be generated instead (default: false) |
-| String[] | packages       | packages to be introspected for entity classes               |
-| boolean  | handleFields   | true, if fields should be treated as properties (default: true) |
-| boolean  | handleMethods  | true, if getters should be treated as properties (default: true) |
-| String   | sourceEncoding | charset encoding for the generated source files              |
-| boolean  | testClasspath  | true, if the test classpath should be used instead           |
+|   类型    |      元素       |                   描述                    |
+| -------- | -------------- | ----------------------------------------- |
+| File     | targetFolder   | 生成源代码的目标文件夹                     |
+| boolean  | scala          | 是否应该生成 Scala 源代码（默认值：false） |
+| String[] | packages       | 要为实体类自省的包                         |
+| boolean  | handleFields   | 如果字段应被视为属性（默认值：true）        |
+| boolean  | handleMethods  | 如果 getter 应该被视为属性（默认值：true） |
+| String   | sourceEncoding | 生成的源文件的字符集编码                   |
+| boolean  | testClasspath  | 是否应该使用测试类路径                     |
 
 
 
-Here is an example for JPA annotated classes
+这是 JPA 注解类的示例
 
-```
+```xml
 <project>
   <build>
     <plugins>
@@ -2724,11 +2725,11 @@ Here is an example for JPA annotated classes
 </project>
 ```
 
-This will export the JPA annotated classes of the `com.example.domain` package and subpackages to the target/generated-sources/java directory.
+这会将 `com.example.domain` 包和子包的 JPA 注解类导出到 `target/generated-sources/java` 目录。
 
-If you need to compile the generated sources directly after that, then you can use the `compile` goal for that.
+如果您需要在此之后直接编译生成的源代码，那么您可以使用 `compile` 目标。
 
-```
+```xml
 <execution>
   <goals>
     <goal>compile</goal>
@@ -2739,30 +2740,30 @@ If you need to compile the generated sources directly after that, then you can u
 </execution>
 ```
 
-The `compile` goal has the following configuration elements
+`compile` 目标具有以下配置元素
 
 
 
-**Table 3.4. Maven configuration**
+**表 3.4. Maven 配置**
 
-| Type    | Element         | Description                                        |
-| ------- | --------------- | -------------------------------------------------- |
-| File    | sourceFolder    | source folder with generated sources               |
-| String  | sourceEncoding  | charset encoding of sources                        |
-| String  | source          | -source option for the compiler                    |
-| String  | target          | -target option for the compiler                    |
-| boolean | testClasspath   | true, if the test classpath should be used instead |
-| Map     | compilerOptions | options for the compiler                           |
+|   类型   |       元素       |          描述           |
+| ------- | --------------- | ----------------------- |
+| File    | sourceFolder    | 生成的源代码的源文件目录 |
+| String  | sourceEncoding  | 源文件的字符编码         |
+| String  | source          | 编译器的 -source 选项    |
+| String  | target          | 编译器的 -target 选项    |
+| boolean | testClasspath   | 是否应该使用测试类路径   |
+| Map     | compilerOptions | 编译器选项               |
 
 
 
-All options except `sourceFolder` are optional.
+除了 `sourceFolder` 之外的所有选项都是可选的。
 
-#### 3.3.6.2. Scala support
+#### 3.3.6.2. Scala 支持
 
-If you need Scala output of the classes, use a variant of the following configuration
+如果您需要类的 Scala 输出，请使用以下配置的变体
 
-```
+```xml
 <project>
   <build>
     <plugins>
