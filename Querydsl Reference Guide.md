@@ -25,7 +25,7 @@ Querydsl诞生于以类型安全的方式维护HQL查询的需求。HQL查询的
 
 HQL for Hibernate是Querydsl的第一个目标语言，但现在它支持JPA、JDO、JDBC、Lucene、Hibernate Search、MongoDB、Collections和RDFBean。
 
-如果您是Java数据库访问的新手，https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java 包含了对各个部分、选项的良好概述，并向您展示了QueryDSL适合的具体位置。
+如果您是Java数据库访问的新手，`https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java` 包含了对各个部分、选项的良好概述，并向您展示了QueryDSL适合的具体位置。
 
 ## 1.2. 规范
 
@@ -99,15 +99,15 @@ Querydsl for JPA 是 JPQL 和 Criteria 查询的替代方案。 它以完全类�
 </project>
 ```
 
-`JPAAnnotationProcessor` 查找使用 `javax.persistence.Entity` 注释的域类型并为它们生成查询类型。
+`JPAAnnotationProcessor` 查找使用 `javax.persistence.Entity` 注解的实体类并为它们生成查询类。
 
-如果您在域类型中使用 Hibernate 注释，则应改用 APT 处理器 `com.querydsl.apt.hibernate.HibernateAnnotationProcessor`。
+如果您在实体类中使用 Hibernate 注解，则应改用 APT 处理器 `com.querydsl.apt.hibernate.HibernateAnnotationProcessor`。
 
-运行`maven clean install`，您将得到生成的查询类型到 `target/generated-sources/java`目录下。
+运行`maven clean install`，您将得到生成的查询类到 `target/generated-sources/java`目录下。
 
 如果您使用 Eclipse，请运行 `mvn eclipse:eclipse` 来更新您的 Eclipse 项目以包含 `target/generated-sources/java` 作为源文件夹。
 
-现在您可以构建 JPA 查询实例和查询域模型的实例。
+现在您可以构建 JPA 查询实例和实体查询类的实例。
 
 ### 2.1.2. Ant集成
 
@@ -134,7 +134,7 @@ Querydsl for JPA 是 JPQL 和 Criteria 查询的替代方案。 它以完全类�
 
 ### 2.1.3. 在 Roo 中使用 Querydsl JPA
 
-如果您将 Querydsl JPA 与 Spring Roo 一起使用，您可以将`com.querydsl.apt.jpa.JPAAnnotationProcessor`替换为`com.querydsl.apt.roo.RooAnnotationProcessor`，将处理`@RooJpaEntity`和`@RooJpaActiveRecord`注释的类，而不是`@Entity`注释的类。
+如果您将 Querydsl JPA 与 Spring Roo 一起使用，您可以将`com.querydsl.apt.jpa.JPAAnnotationProcessor`替换为`com.querydsl.apt.roo.RooAnnotationProcessor`，将处理`@RooJpaEntity`和`@RooJpaActiveRecord`注解的类，而不是`@Entity`注解的类。
 
 基于 APT 的代码生成不适用于 AspectJ IDT。
 
@@ -153,15 +153,15 @@ HibernateDomainExporter exporter = new HibernateDomainExporter(
 exporter.export();
 ```
 
-HibernateDomainExporter 需要在域类型可见的类路径中执行，因为属性类型是通过反射解析的。
+HibernateDomainExporter 需要在实体类型可见的类路径中执行，因为属性类型是通过反射解析的。
 
-所有 JPA 注释都被忽略，但 Querydsl 注释如 `@QueryInit` 和 `@QueryType` 被考虑在内。
+所有 JPA 注解都被忽略，但 Querydsl 注解如 `@QueryInit` 和 `@QueryType` 被考虑在内。
 
 ### 2.1.5. 使用查询类型
 
 要使用Querydsl创建查询，需要实例化变量和Query实现。我们将从变量开始。
 
-让我们假设你的项目有以下域类型:
+让我们假设你的项目有以下实体类型:
 
 ```java
 @Entity
@@ -187,7 +187,7 @@ public class Customer {
 }
 ```
 
-Querydsl 将在与 Customer 相同的包中生成一个简单名称为 QCustomer 的查询类型。 QCustomer 可以用作 Querydsl 查询中的静态类型变量，作为 Customer 类型的代表。
+Querydsl 将在与 Customer 相同的包中生成一个名称为 QCustomer 的查询类型。 QCustomer 可以用作 Querydsl 查询中的静态类型变量，作为 Customer 类型的代表。
 
 QCustomer 有一个可以作为静态字段访问的默认实例变量：
 
@@ -234,7 +234,7 @@ Customer bob = queryFactory.selectFrom(customer)
   .fetchOne();
 ```
 
-selectFrom 调用定义了查询源和投影， where 部分定义了过滤器， fetchOne 告诉 Querydsl 返回单个元素。 很简单，对吧？
+selectFrom 调用定义了**查询源和投影**， where 部分定义了过滤器， fetchOne 告诉 Querydsl 返回单个元素。 很简单，对吧？
 
 要使用多个源创建查询，您可以使用如下查询：
 
@@ -274,7 +274,7 @@ queryFactory.selectFrom(customer)
 
 ### 2.1.7. 使用连接
 
-Querydsl 支持 JPQL 中的以下联接变体：内联接、联接、左联接和右联接。 联接使用是类型安全的，并遵循以下模式：
+Querydsl 支持 JPQL 中的以下连接变体：内连接、连接、左连接和右连接。 联接使用是类型安全的，并遵循以下模式：
 
 ```java
 QCat cat = QCat.cat;
@@ -425,21 +425,24 @@ queryFactory.selectFrom(employee)
     .fetch();
 ```
 
-### 2.1.14. 暴露原始查询
+### 2.1.14. 使用原始JPA的Query
 
-如果你需要在执行查询之前调整原始查询，你可以像这样暴露它:
+如果你需要在执行查询之前调整原始JPA Query(javax.persistence.Query)，你可以像这样暴露它:
 
 ```java
-Query jpaQuery = queryFactory.selectFrom(employee).createQuery();
+javax.persistence.Query jpaQuery = queryFactory.selectFrom(QEmployee.employee).createQuery();
+
 // ...
-List results = jpaQuery.getResultList();
+
+@SuppressWarnings("unchecked")
+List<Employee> results = (List<Employee>) jpaQuery.getResultList();
 ```
 
 ### 2.1.15. 在JPA查询中使用Native SQL
 
 Querydsl通过`JPASQLQuery`类在JPA中支持Native SQL。
 
-To use it, you must generate Querydsl query types for your SQL schema. This can be done for example with the following Maven configuration:
+要使用它，您必须为您的 SQL 模式生成 Querydsl 查询类型。 例如，这可以通过以下 Maven 配置来完成：
 
 ```xml
 <project>
@@ -513,7 +516,6 @@ List<Tuple> rows = query.select(cat.id, cat.name).from(cat).fetch();
 
 ```java
 List<Tuple> rows = query.select(cat.all()).from(cat).fetch();
- 
 ```
 
 在 SQL 中查询，但投影为实体：
@@ -1967,9 +1969,9 @@ QueryEngine queryEngine = new DefaultQueryEngine(evaluatorFactory);
 CollQuery query = new CollQuery(queryEngine);
 ```
 
-# 3. 通用用法
+# 3. 一般用法
 
-通用用法部分涵盖了参考文档的教程部分中没有涉及的方面。它遵循一个面向用例的结构。
+一般用法部分涵盖了参考文档的教程部分中没有涉及的方面。它遵循一个面向用例的结构。
 
 ## 3.1. 创建查询
 
@@ -1979,7 +1981,7 @@ Querydsl 中的查询构造涉及使用表达式参数调用查询方法。 由�
 
 ### 3.1.1. 复杂的谓词(predicates)
 
-要构造复杂的布尔表达式，请使用`com.querydsl.core.BooleanBuilder` 类。 它实现了 Predicate 并且可以以级联形式使用：
+要构造复杂的布尔表达式，请使用`com.querydsl.core.BooleanBuilder` 类。 它实现了 `Predicate` 并且可以以级联形式使用：
 
 ```java
 public List<Customer> getCustomer(String... names) {
@@ -2018,7 +2020,7 @@ Constant<String> constant = Expressions.constant("P");
 Expressions.predicate(Ops.STARTS_WITH, personFirstName, constant);
 ```
 
-Path 实例表示变量和属性，Constants 是常量，Operations 是操作，TemplateExpression 实例可用于将表达式表示为 String 模板。
+`Path` 实例表示变量和属性，`Constant` 是常量，`Operation` 是操作，`TemplateExpression` 实例可用于将表达式表示为 String 模板。
 
 ### 3.1.3. 动态路径
 
@@ -2070,7 +2072,7 @@ entityPath.getMap("map", String.class, String.class, StringPath.class).get("key"
 PathBuilder<Customer> customer = new PathBuilder<Customer>(Customer.class, "customer", validator);
 ```
 
-PathBuilderValidator.FIELDS 将验证字段是否存在，PathBuilderValidator.PROPERTIES 验证 Bean 属性，JPAPathBuilderValidator 使用 JPA 元模型进行验证。
+`PathBuilderValidator.FIELDS` 将验证字段是否存在，`PathBuilderValidator.PROPERTIES` 验证 Bean 属性，`JPAPathBuilderValidator` 使用 JPA 元模型进行验证。
 
 ### 3.1.4. CASE 表达式
 
@@ -2095,7 +2097,8 @@ Expression<String> cases = customer.annualSpending
     .when(5000).then("Gold")
     .when(2000).then("Silver")
     .otherwise("Bronze");
-// 现在可以在投影或条件中使用 case 表达式
+
+// 下面可以在投影或条件中使用 case 表达式
 ```
 
 JDOQL 尚不支持 Case 表达式。
@@ -2104,7 +2107,7 @@ JDOQL 尚不支持 Case 表达式。
 
 为了避免表达式类型中的泛型签名，类型层次结构被扁平化。 结果是所有生成的查询类型都是 `com.querydsl.core.types.dsl.EntityPathBase` 或 `com.querydsl.core.types.dsl.BeanPath` 的直接子类，不能直接转换为它们的逻辑超类型。
 
-超类型引用可以通过`_super`'字段访问，而不是直接的Java强制转换。`_super-field`在所有生成的查询类型中都是可用的，只有一个超类型:
+超类型引用可以通过`_super`'字段访问，而不是直接的Java强制转换。`_super`字段在所有生成的查询类型中都是可用的，只有一个超类型:
 
 ```java
 // from Account
@@ -2121,7 +2124,7 @@ QBankAccount extends EntityPathBase<BankAccount> {
 }
 ```
 
-要将超类型转换为子类型，可以使用EntityPathBase类的as-method:
+要将超类型转换为子类型，可以使用EntityPathBase类的`as`方法:
 
 ```java
 QAccount account = new QAccount("account");
@@ -2220,7 +2223,7 @@ List<CustomerDTO> dtos = query.select(new QCustomerDTO(customer.id, customer.nam
 
 虽然这个示例是特定于Hibernate的，但该特性在所有模块中都可用。
 
-如果QueryProjection注释的类型不是一个带注释的实体类型,您可以使用构造函数投影,但如果注释的类型是实体类型，则需要通过调用 查询类型的静态`create`方法：
+如果QueryProjection注解的类型不是一个带注解的实体类型,您可以使用构造函数投影,但如果注解的类型是实体类型，则需要通过调用 查询类型的静态`create`方法：
 
 ```java
 @Entity
