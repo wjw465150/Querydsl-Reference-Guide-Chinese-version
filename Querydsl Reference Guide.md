@@ -221,7 +221,8 @@ HibernateQuery<?> query = new HibernateQuery<Void>(session);
 
 `JPAQuery` 和 `HibernateQuery` 都实现了 `JPQLQuery` 接口。
 
-对于本章的示例，查询是通过`JPAQueryFactory`实例创建的。 `JPAQueryFactory` 应该是获取 `JPAQuery` 实例的首选选项。
+对于本章的示例，查询是通过`JPAQueryFactory`实例创建的。 
+> **💡提示:** `JPAQueryFactory` 应该是获取 `JPAQuery` 实例的首选选项。
 
 可以使用 Hibernate API `HibernateQueryFactory`
 
@@ -315,21 +316,21 @@ on kitten.bodyWeight > 10.0
 
 像这样使用 JPQLQuery 接口的级联方法
 
-**select:**  设置查询的投影。 （如果通过查询工厂创建则不需要）
++ **select:**  设置查询的投影。 （如果通过查询工厂创建则不需要）
 
-**from:**  在此处添加查询源。
++ **from:**  在此处添加查询源。
 
-**innerJoin, join, leftJoin, rightJoin, on:**  使用这些构造添加连接元素。 对于连接方法，第一个参数是连接源，第二个参数是目标（别名）。
++ **innerJoin, join, leftJoin, rightJoin, on:**  使用这些构造添加连接元素。 对于连接方法，第一个参数是连接源，第二个参数是目标（别名）。
 
-**where:** 添加查询过滤器，以逗号分隔的可变参数形式或通过 and 运算符级联。
++ **where:** 添加查询过滤器，以逗号分隔的可变参数形式或通过 and 运算符级联。
 
-**groupBy:** 以可变参数形式添加 group by 参数。
++ **groupBy:** 以可变参数形式添加 group by 参数。
 
-**having:** 添加具有“group by”分组的过滤器作为谓词表达式的 varags 数组。
++ **having:** 添加具有“group by”分组的过滤器作为谓词表达式的 varags 数组。
 
-**orderBy:** 将结果的排序添加为顺序表达式的可变参数数组。 在数字、字符串和其他可比较的表达式上使用 asc() 和 desc() 来访问 OrderSpecifier 实例。
++ **orderBy:** 将结果的排序添加为顺序表达式的可变参数数组。 在数字、字符串和其他可比较的表达式上使用 asc() 和 desc() 来访问 OrderSpecifier 实例。
 
-**limit, offset, restrict:** 设置结果的分页。 最大结果的限制，跳过行的偏移量和在一次调用中定义两者的限制。
++ **limit, offset, restrict:** 设置结果的分页。 最大结果的限制，跳过行的偏移量和在一次调用中定义两者的限制。
 
 ### 2.1.9. 排序
 
@@ -381,7 +382,7 @@ queryFactory.delete(customer).where(customer.level.lt(3)).execute();
 
 where 调用是可选的，execute 调用执行删除并返回已删除实体的数量。
 
->  ==**💡提示:**== JPA中的DML子句没有考虑JPA级别的级联规则，也不提供细粒度的二级缓存交互。
+>  **💡提示:** JPA中的DML子句没有考虑JPA级别的级联规则，也不提供细粒度的二级缓存交互。
 
 ### 2.1.12. 更新子句
 
@@ -1783,6 +1784,156 @@ public class JdbcConfiguration {
 
 
 
+## 2.7. Querying Mongodb
+
+This chapter describes the querying functionality of the Mongodb module.
+
+### 2.7.1. Maven integration
+
+Add the following dependencies to your Maven project:
+
+```
+<dependency>
+  <groupId>com.querydsl</groupId>
+  <artifactId>querydsl-apt</artifactId>
+  <version>${querydsl.version}</version>
+  <scope>provided</scope>
+</dependency>
+
+<dependency>
+  <groupId>com.querydsl</groupId>
+  <artifactId>querydsl-mongodb</artifactId>
+  <version>${querydsl.version}</version>
+</dependency>
+
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-log4j12</artifactId>
+  <version>1.6.1</version>
+</dependency>
+```
+
+And now, configure the Maven APT plugin which generates the query types used by Querydsl:
+
+```
+<project>
+  <build>
+    <plugins>
+      ...
+      <plugin>
+        <groupId>com.mysema.maven</groupId>
+        <artifactId>apt-maven-plugin</artifactId>
+        <version>1.1.3</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/generated-sources/java</outputDirectory>
+              <processor>com.querydsl.apt.morphia.MorphiaAnnotationProcessor</processor>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    ...
+    </plugins>
+  </build>
+</project>
+```
+
+The MorphiaAnnotationProcessor finds domain types annotated with the `com.google.code.morphia.annotations.Entity` annotation and generates Querydsl query types for them.
+
+Run clean install and you will get your Query types generated into target/generated-sources/java.
+
+If you use Eclipse, run mvn eclipse:eclipse to update your Eclipse project to include target/generated-sources/java as a source folder.
+
+Now you are able to construct Mongodb queries and instances of the query domain model.
+
+### 2.7.2. Querying
+
+Querying with Querydsl Mongodb with Morphia is as simple as this:
+
+```
+Morphia morphia;
+Datastore datastore;
+// ...
+QUser user = new QUser("user");
+MorphiaQuery<User> query = new MorphiaQuery<User>(morphia, datastore, user);
+List<User> list = query
+    .where(user.firstName.eq("Bob"))
+    .fetch();
+```
+
+### 2.7.3. General usage
+
+Use the the cascading methods of the MongodbQuery class like this
+
+*where:* Add the query filters, either in varargs form separated via commas or cascaded via the and-operator. Supported operations are operations performed on PStrings except *matches* , *indexOf* , *charAt* . Currently *in* is not supported, but will be in the future.
+
+*orderBy:* Add ordering of the result as an varargs array of order expressions. Use asc() and desc() on numeric, string and other comparable expression to access the OrderSpecifier instances.
+
+*limit, offset, restrict:* Set the paging of the result. Limit for max results, offset for skipping rows and restrict for defining both in one call.
+
+### 2.7.4. Ordering
+
+The syntax for declaring ordering is
+
+```
+query
+    .where(doc.title.like("*"))
+    .orderBy(doc.title.asc(), doc.year.desc())
+    .fetch();
+```
+
+The results are sorted ascending based on title and year.
+
+### 2.7.5. Limit
+
+The syntax for declaring a limit is
+
+```
+query
+    .where(doc.title.like("*"))
+    .limit(10)
+    .fetch();
+```
+
+### 2.7.6. Offset
+
+The syntax for declaring an offset is
+
+```
+query
+    .where(doc.title.like("*"))
+    .offset(3)
+    .fetch();
+```
+
+### 2.7.7. Geospatial queries
+
+Support for geospatial queries is available for Double typed arrays (Double[]) via the near-method:
+
+```
+query
+    .where(geoEntity.location.near(50.0, 50.0))
+    .fetch();
+```
+
+### 2.7.8. Select only relevant fields
+
+To select only relevant fields you can use the overloaded projection methods fetch, iterate, fetchOne and fetchFirst methods like this
+
+```
+query
+    .where(doc.title.like("*"))
+    .fetch(doc.title, doc.path);
+```
+
+This query will load only the title and path fields of the documents.
+
+
+
 ## 2.8. Querying Collections
 
 The querydsl-collections module can be used with generated query types and without. The first section describes the usage without generated query types:
@@ -1973,13 +2124,13 @@ CollQuery query = new CollQuery(queryEngine);
 
 一般用法部分涵盖了参考文档的教程部分中没有涉及的方面。它遵循一个面向用例的结构。
 
-## 3.1. 创建查询
+## 3.1. 创建查询(Creating queries)
 
 Querydsl 中的查询构造涉及使用表达式参数调用查询方法。 由于查询方法大多是特定于模块的，并且已经在教程部分介绍过，因此本部分将重点介绍表达式。
 
 表达式通常是通过访问域模块生成的表达式类型的字段和调用方法来构造的。对于代码生成不适用的情况，可以使用通用的方法来构造表达式。
 
-### 3.1.1. 复杂的谓词(predicates)
+### 3.1.1. 复杂的谓词(Complex predicates)
 
 要构造复杂的布尔表达式，请使用`com.querydsl.core.BooleanBuilder` 类。 它实现了 `Predicate` 并且可以以级联形式使用：
 
@@ -1998,9 +2149,9 @@ public List<Customer> getCustomer(String... names) {
 
 `BooleanBuilder` 是可变的，最初表示为 null，并且在每次 `and` 或 `or` 调用之后表示操作的结果。
 
-### 3.1.2. 动态表达式(expressions)
+### 3.1.2. 动态表达式(Dynamic expressions)
 
-`com.querydsl.core.types.dsl.Expressions` 类是用于动态表达式构建的静态工厂类。 工厂方法由返回的类型命名，并且大多是自文档的。
+`com.querydsl.core.types.dsl.Expressions` 类是一个用于动态表达式构造的静态工厂类。 工厂方法由返回的类型命名，并且大多是自文档的。
 
 一般来说，`Expressions` 类应该只在不能使用流畅的 DSL 形式的情况下使用，例如动态路径、自定义语法或自定义操作。
 
@@ -2022,7 +2173,7 @@ Expressions.predicate(Ops.STARTS_WITH, personFirstName, constant);
 
 `Path` 实例表示变量和属性，`Constant` 是常量，`Operation` 是操作，`TemplateExpression` 实例可用于将表达式表示为 String 模板。
 
-### 3.1.3. 动态路径
+### 3.1.3. 动态路径(Dynamic paths)
 
 除了基于`Expressions` 的表达式创建，Querydsl 还为动态路径创建提供了更流畅的 API。
 
@@ -2320,8 +2471,6 @@ Querydsl的序列化可以通过包和类型上的Config注解进行定制。它
 
 序列化选项是
 
-
-
 **表 3.1. 配置选项**
 
 |          名称          |                         描述                          |
@@ -2356,8 +2505,6 @@ import com.querydsl.core.annotations.Config;
 ```
 
 如果您想全局定制序列化器配置，可以通过以下APT选项来实现
-
-
 
 **表 3.2. APT 选项**
 
@@ -2808,15 +2955,15 @@ export("org.xyz.abc")
 </project>
 ```
 
-# 4. Troubleshooting
+# 4. 故障排除
 
-## 4.1. Insufficient type arguments
+## 4.1. 类型参数不足
 
-Querydsl needs properly encoded List Set, Collection and Map properties in all code generation scenarios.
+Querydsl 在所有代码生成场景中都需要正确编码的 List Set、Collection 和 Map 属性。
 
-When using improperly encoded fields or getters you might the following stacktrace:
+当使用不正确编码的字段或 getter 时，您可能会出现以下堆栈跟踪：
 
-```
+```java
 java.lang.RuntimeException: Caught exception for field com.querydsl.jdo.testdomain.Store#products
   at com.querydsl.apt.Processor$2.visitType(Processor.java:117)
   at com.querydsl.apt.Processor$2.visitType(Processor.java:80)
@@ -2834,9 +2981,9 @@ Caused by: java.lang.IllegalArgumentException: Insufficient type arguments for L
   ... 35 more
 ```
 
-Examples of problematic field declarations and their corrections:
+有问题的字段声明及其更正示例：
 
-```
+```java
     private Collection names; // WRONG
 
     private Collection<String> names; // RIGHT
@@ -2846,25 +2993,25 @@ Examples of problematic field declarations and their corrections:
     private Map<String,Employee> employeesByName; // RIGHT
 ```
 
-## 4.2. Multithreaded initialization of Querydsl Q-types
+## 4.2. Querydsl Q 类型的多线程初始化
 
-When Querydsl Q-types are initialized from multiple threads, deadlocks can occur, if the Q-types have circular dependencies.
+当 Querydsl Q-types 从多个线程初始化时，如果 Q-types 具有循环依赖关系，可能会发生死锁。
 
-An easy to use solution is to initialize the classes in a single thread before they are used in different threads.
+一个易于使用的解决方案是在将类用于不同线程之前在单个线程中初始化它们。
 
-The com.querydsl.codegen.ClassPathUtils class can be used for that like this:
+`com.querydsl.codegen.ClassPathUtils` 类可以这样使用：
 
-```
+```java
     ClassPathUtils.scanPackage(Thread.currentThread().getContextClassLoader(), packageToLoad);
 ```
 
-Replace packageToLoad with the package of the classes you want to initialize.
+将 packageToLoad 替换为要初始化的类的包。
 
-## 4.3. JDK5 usage
+## 4.3. JDK5 用法
 
-When compiling your project with JDK 5, you might get the following compilation failure:
+使用 JDK 5 编译项目时，您可能会遇到以下编译失败：
 
-```
+```bash
 [INFO] ------------------------------------------------------------------------
 [ERROR] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
@@ -2873,8 +3020,8 @@ When compiling your project with JDK 5, you might get the following compilation 
 class file has wrong version 50.0, should be 49.0
 ```
 
-The class file version 50.0 is used by Java 6.0, and 49.0 is used by Java 5.0.
+Java 6.0 使用类文件版本 50.0，Java 5.0 使用 49.0。
 
-Querydsl is tested against JDK 6.0 only, as we use APT extensively, which is available only since JDK 6.0.
+Querydsl 仅针对 JDK 6.0 进行测试，因为我们广泛使用 APT，它仅在 JDK 6.0 之后可用。
 
-If you want to use it with JDK 5.0 you might want to try to compile Querydsl yourself.
+如果您想将它与 JDK 5.0 一起使用，您可能想尝试自己编译 Querydsl。
